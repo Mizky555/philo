@@ -30,3 +30,22 @@ int	ft_isdigit(int c)
 	else
 		return (0);
 }
+
+int check_digit(char **argv)
+{
+    int i = 1;
+    int j = 0;
+
+    while (argv[i]) 
+    {
+        j = 0;
+        while (argv[i][j])
+        {
+            if (argv[i][j] < '0' || argv[i][j] > '9')
+                return (0);
+            j++;
+        }
+        i++;
+    }
+    return (1);
+}

@@ -6,15 +6,21 @@
 # include <stdlib.h>
 # include <pthread.h>
 
-typedef struct s_philo
+typedef struct s_main
 {
     int number;
     int time_die;
     int time_eat;
     int time_sleep;
+}   t_main;
+
+typedef struct s_philo
+{
     int must_eat;
     int *name;
     int index;
+    t_main  *m;
+    
 }   t_philo;
 
 

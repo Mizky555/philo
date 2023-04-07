@@ -12,20 +12,16 @@ typedef struct s_main
     int time_die;
     int time_eat;
     int time_sleep;
+    int must_eat;
+    int name;
+    pthread_t philo;
+    // int index;
 }   t_main;
 
-typedef struct s_philo
-{
-    int must_eat;
-    int *name;
-    int index;
-    t_main  *m;
-    
-}   t_philo;
 
 
 
-
+int check_digit(char **argv);
 int ft_atoi(const char *str);
 
 #endif

@@ -14,9 +14,14 @@ typedef struct s_main
     int time_sleep;
     int must_eat;
     int name;
+    int fork;
     pthread_t philo;
-    // int index;
+    pthread_mutex_t fork_r;
+    pthread_mutex_t *l_fork;
+    
 }   t_main;
+
+
 
 
 

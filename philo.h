@@ -5,6 +5,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <pthread.h>
+# include <sys/time.h>
 
 typedef struct s_main
 {
@@ -18,7 +19,7 @@ typedef struct s_main
     pthread_t philo;
     pthread_mutex_t fork_r;
     pthread_mutex_t *l_fork;
-    
+
 }   t_main;
 
 

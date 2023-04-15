@@ -14,11 +14,13 @@ typedef struct s_main
     int time_eat;
     int time_sleep;
     int must_eat;
+    int meals;
     int name;
     int fork;
     pthread_t philo;
     pthread_mutex_t fork_r;
-    pthread_mutex_t *l_fork;
+    pthread_mutex_t *l_fork; //ต้องเก็บส้อมของคนข้างๆ เลยต้องเป๋น Pointer(ต้องชี้เพื่อหยิบ)
+
 
 }   t_main;
 

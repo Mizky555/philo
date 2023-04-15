@@ -1,12 +1,11 @@
 #include "philo.h"
 
-int time_milli(int time_start)
+long time_milli(void)
 {
     struct timeval time_now;
 
-
     gettimeofday(&time_now, NULL);
-    return (((time_now.tv_sec * 1000) + (time_now.tv_usec / 1000)) - time_start);
+    return (((time_now.tv_sec * 1000) + (time_now.tv_usec / 1000)));
 }
 
 
@@ -34,12 +33,13 @@ t_main *initialize_philo(t_main *m, int argc, char **argv) //แปลว่า�
         m[i - 1].time_die = ft_atoi(argv[2]);
         m[i - 1].time_eat = ft_atoi(argv[3]);
         m[i - 1].time_sleep = ft_atoi(argv[4]);
+        m[i - 1].meals = 0;
+        m[i - 1].name = i;
         m[i - 1].fork = 1;
         if (argc == 6)
             m[i - 1].must_eat = ft_atoi(argv[5]);
         else if (argc == 5)
             m[i - 1].must_eat = 0;
-        m[i - 1].name = i;
         i++;
     }
     // for (int i = 0 ; i < m[0].number ; i++)
@@ -47,45 +47,65 @@ t_main *initialize_philo(t_main *m, int argc, char **argv) //แปลว่า�
     //     printf("%d fork _r  =  %p\n", i, &m[i].fork_r);
     //     printf("%d l_fork  =  %p\n", i, m[i].l_fork);
     // }
-    struct timeval t;
-    time_milli(gettimeofday(&t, NULL));
-    exit(1);
-
     return (m);
 }
-
 
 
 void    *status_philo(void *input)
 {
     t_main *m;
     int i = 1;
+    long    start;
 
     m = (t_main *)input;
+    start = time_milli(); //start
     while (i)
     {
-        // usleep(400);
-        // pthread_mutex_lock(&m->fork_r);
-        // pthread_mutex_lock(m->l_fork);
-        printf("%d has taken a fork\n",m->name);
-        printf("%d is eating\n",m->name);
-        printf("%d is sleeping\n",m->name);
-        printf("%d is thinking\n",m->name);
-        // pthread_mutex_unlock(&m->fork_r);
-        // pthread_mutex_unlock(m->l_fork);
+        pthread_mutex_lock(&m->fork_r);
+        printf("%ld ms, %d has taken a fork_r\n",time_milli() - start, m->name);
+        pthread_mutex_lock(m->l_fork);
+        printf("%ld ms, %d has taken a l_fork\n",time_milli() - start, m->name);
+        printf("%ld ms, %d is eating\n",time_milli() - start, m->name);//เวลาเริ่มกิน(time_milli คือเวลาจบ -> end - start)
+        usleep(m->time_eat * 1000);//เวลาในการกิน
+        m->meals++;
+        pthread_mutex_unlock(&m->fork_r);
+        pthread_mutex_unlock(m->l_fork);
+        if (m->meals == m->must_eat)//ครบจำนวนการกินทุกตัว = จบ
+            break;
+        printf("%ld ms, %d is sleeping\n",time_milli() - start, m->name);//เวลาเริ่มนอน
+        usleep(m->time_sleep * 1000);//เวลาในการนอน
+        printf("%ld ms, %d is thinking\n",time_milli() - start, m->name);
     }
     return (0);
 }
+
+/*
+name philo
+1 2 3 4
+1 3 ได้กิน   % 2 != 0 lock R
+1 แย่ง 2   3 แย่ง 4    % 2 = 0 ไม่ได้กิน
+----------
+จับเวลาก่อนนอน - เวลาเริ่มกินรอบถัดไป
+เวลาเริ่มกินรอบถัดไป - เวลาก่อนนอนของรอบที่ผ่านมา ห้ามเกิน time_die
+*/
+
 
 void    simulation(t_main *m)
 {
     int i = 1;
 
-
-    while (i <= m[0].number)
+    while (i <= m[0].number)//เลขคี่
     {
-
-        pthread_create(&m[i - 1].philo, NULL, &status_philo, (void *)&m[i - 1]);//แตกหน่อ
+        if (m[i - 1].name % 2 != 0)
+            pthread_create(&m[i - 1].philo, NULL, &status_philo, (void *)&m[i - 1]);//แตกหน่อ 1
+        i++;
+    }
+    i = 1;
+    usleep(100);
+    while (i <= m[0].number)//เลขคู่
+    {
+        if (m[i - 1].name % 2 == 0)
+            pthread_create(&m[i - 1].philo, NULL, &status_philo, (void *)&m[i - 1]);//แตกหน่อ
         i++;
     }
     i = 1;
@@ -110,6 +130,8 @@ int main(int argc, char **argv)
         printf("Error is not digit\n");
         return (0);
     }
+    if (ft_atoi(argv[5]) == 0)
+        return (0);
     m = initialize_philo(m, argc, argv);//กำหนดค่าให้กับ Philo ทุกคน
     simulation(m);//Philo กินนอนคิด จับเวลา
 

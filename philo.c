@@ -51,29 +51,70 @@ t_main *initialize_philo(t_main *m, int argc, char **argv) //แปลว่า�
 }
 
 
+// void    *status_philo(void *input)
+// {
+//     t_main *m;
+//     int i = 1;
+//     long    start;
+
+//     m = (t_main *)input;
+//     start = time_milli(); //start
+//     while (i)
+//     {
+//         pthread_mutex_lock(&m->fork_r);
+//         printf("%ld ms, %d has taken a fork_r\n",time_milli() - start, m->name);
+//         pthread_mutex_lock(m->l_fork);
+//         printf("%ld ms, %d has taken a l_fork\n",time_milli() - start, m->name);
+//         printf("%ld ms, %d is eating\n",time_milli() - start, m->name);//เวลาเริ่มกิน(time_milli คือเวลาจบ -> end - start)
+//         usleep(m->time_eat * 1000);//เวลาในการกิน
+//         m->meals++;
+//         pthread_mutex_unlock(&m->fork_r);
+//         pthread_mutex_unlock(m->l_fork);
+//         if (m->meals == m->must_eat)//ครบจำนวนการกินทุกตัว = จบ
+//             break;
+//         printf("%ld ms, %d is sleeping\n",time_milli() - start, m->name);//เวลาเริ่มนอน
+//         usleep(m->time_sleep * 1000);//เวลาในการนอน
+//         printf("%ld ms, %d is thinking\n",time_milli() - start, m->name);
+//     }
+//     return (0);
+// }
+
 void    *status_philo(void *input)
 {
     t_main *m;
     int i = 1;
     long    start;
+    long    t;
+    long    tmp;
 
     m = (t_main *)input;
     start = time_milli(); //start
+    tmp = 0;
     while (i)
     {
         pthread_mutex_lock(&m->fork_r);
         printf("%ld ms, %d has taken a fork_r\n",time_milli() - start, m->name);
         pthread_mutex_lock(m->l_fork);
         printf("%ld ms, %d has taken a l_fork\n",time_milli() - start, m->name);
-        printf("%ld ms, %d is eating\n",time_milli() - start, m->name);//เวลาเริ่มกิน(time_milli คือเวลาจบ -> end - start)
-        usleep(m->time_eat * 1000);//เวลาในการกิน
+        printf("%ld ms, %d is eating\n",time_milli() - start, m->name);
+        usleep(m->time_eat * 1000);
         m->meals++;
         pthread_mutex_unlock(&m->fork_r);
         pthread_mutex_unlock(m->l_fork);
-        if (m->meals == m->must_eat)//ครบจำนวนการกินทุกตัว = จบ
-            break;
-        printf("%ld ms, %d is sleeping\n",time_milli() - start, m->name);//เวลาเริ่มนอน
-        usleep(m->time_sleep * 1000);//เวลาในการนอน
+        if (m->meals == m->must_eat)
+            return (0);
+        t = time_milli() - start;
+        if (tmp != 0)
+        {
+            if ((t - tmp) > m->time_die)
+            {   printf("%ld ms, %d is die",t , m->name);
+                return (0);
+            }
+        }
+        tmp = t;
+        printf("%ld ms, %d is sleeping\n", t, m->name);//เวลาเริ่มนอน
+        usleep(m->time_sleep * 1000);
+
         printf("%ld ms, %d is thinking\n",time_milli() - start, m->name);
     }
     return (0);
@@ -139,7 +180,4 @@ int main(int argc, char **argv)
 }
 
 
-
-//ทำเงื่อนไขการขโมย ft simu ให้ตรงตามโจทย
-//ทำเงื่อนไข must_eat philo die
-//เวลา กิน นอน อดตาย
+//ดูสูตรพี่เน หาเวลาว่าพอมั้ย ไม่พอให้ตาย

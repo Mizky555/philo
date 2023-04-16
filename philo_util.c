@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_util.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tsirirak <tsirirak@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/04/17 02:00:27 by tsirirak          #+#    #+#             */
+/*   Updated: 2023/04/17 02:00:27 by tsirirak         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 int	ft_atoi(const char *str)
@@ -16,7 +28,7 @@ int	ft_atoi(const char *str)
 	if (str[i] == '-' || str[i] == '+')
 		i++;
 	while (str[i] >= '0' && str[i] <= '9')
-	{	
+	{
 		num = num * 10 + (str[i] - '0');
 		i++;
 	}
@@ -31,21 +43,23 @@ int	ft_isdigit(int c)
 		return (0);
 }
 
-int check_digit(char **argv)
+int	check_digit(char **argv)
 {
-    int i = 1;
-    int j = 0;
+	int	i;
+	int	j;
 
-    while (argv[i]) 
-    {
-        j = 0;
-        while (argv[i][j])
-        {
-            if (argv[i][j] < '0' || argv[i][j] > '9')
-                return (0);
-            j++;
-        }
-        i++;
-    }
-    return (1);
+	i = 1;
+	j = 0;
+	while (argv[i])
+	{
+		j = 0;
+		while (argv[i][j])
+		{
+			if (argv[i][j] < '0' || argv[i][j] > '9')
+				return (0);
+			j++;
+		}
+		i++;
+	}
+	return (1);
 }

@@ -35,7 +35,9 @@ t_main *initialize_philo(t_main *m, int argc, char **argv) //แปลว่า�
         m[i - 1].time_sleep = ft_atoi(argv[4]);
         m[i - 1].meals = 0;
         m[i - 1].name = i;
-        m[i - 1].fork = 1;
+        //m[i - 1].fork = 1;
+        m[i - 1].after_eat_time = 0;
+        m[i - 1].mod = 0;
         if (argc == 6)
             m[i - 1].must_eat = ft_atoi(argv[5]);
         else if (argc == 5)
@@ -79,43 +81,91 @@ t_main *initialize_philo(t_main *m, int argc, char **argv) //แปลว่า�
 //     return (0);
 // }
 
+int    is_philo_dead(t_main *m, int activity)
+{
+    long    remain_life;//เวลาชีวิตที่เหลืออยู่
+
+    remain_life = ((m->time_die) - (time_milli() - m->after_eat_time));
+
+    if ((remain_life - activity) <= 0)
+    {
+        if (remain_life < 0)
+            remain_life = remain_life * -1;
+        usleep((remain_life) * 1000);
+        return (1);
+    }
+    usleep(activity * 1000);
+    return(0);
+}
+
 void    *status_philo(void *input)
 {
     t_main *m;
     int i = 1;
     long    start;
-    long    t;
-    long    tmp;
 
     m = (t_main *)input;
     start = time_milli(); //start
-    tmp = 0;
+    m->after_eat_time = start;
+
+    // printf("number = %d\n",m->number);
+    // printf("number = %d\n",m->time_die);
+    // printf("number = %d\n",m->time_eat);
+    // printf("number = %d\n",m->time_sleep);
+    // printf("number = %d\n",m->must_eat);
+    printf("mane = %d  print = %p\n",m->name, m->print);
     while (i)
     {
         pthread_mutex_lock(&m->fork_r);
+        pthread_mutex_lock(m->print);
         printf("%ld ms, %d has taken a fork_r\n",time_milli() - start, m->name);
+        pthread_mutex_unlock(m->print);
         pthread_mutex_lock(m->l_fork);
+        pthread_mutex_lock(m->print);
         printf("%ld ms, %d has taken a l_fork\n",time_milli() - start, m->name);
+        pthread_mutex_unlock(m->print);
+        pthread_mutex_lock(m->print);
         printf("%ld ms, %d is eating\n",time_milli() - start, m->name);
-        usleep(m->time_eat * 1000);
+        pthread_mutex_unlock(m->print);
+
+            // pthread_mutex_lock(m->print);
+        if (is_philo_dead(m, m->time_eat) == 1)
+        {
+            usleep(100);
+            printf("%ld ms, %d is die\n",time_milli() - start, m->name);
+            // sleep(1);
+            // pthread_mutex_unlock(&m->fork_r);
+            // pthread_mutex_unlock(m->l_fork);
+            m->mod = 1;
+            return (0);
+        }
+
+        m->after_eat_time = time_milli();
         m->meals++;
         pthread_mutex_unlock(&m->fork_r);
         pthread_mutex_unlock(m->l_fork);
-        if (m->meals == m->must_eat)
-            return (0);
-        t = time_milli() - start;
-        if (tmp != 0)
-        {
-            if ((t - tmp) > m->time_die)
-            {   printf("%ld ms, %d is die",t , m->name);
-                return (0);
-            }
-        }
-        tmp = t;
-        printf("%ld ms, %d is sleeping\n", t, m->name);//เวลาเริ่มนอน
-        usleep(m->time_sleep * 1000);
 
+        if (m->meals == m->must_eat)
+        {
+            m->mod = 1;
+            return (0);
+        }
+
+        pthread_mutex_lock(m->print);
+        printf("%ld ms, %d is sleeping\n", time_milli() - start, m->name);
+        pthread_mutex_unlock(m->print);
+
+        if (is_philo_dead(m, m->time_sleep) == 1)
+        {
+            m->mod = 1;
+            pthread_mutex_lock(m->print);
+            printf("%ld ms, %d is die\n",time_milli() - start, m->name);
+            exit(0);
+        }
+
+        pthread_mutex_lock(m->print);
         printf("%ld ms, %d is thinking\n",time_milli() - start, m->name);
+        pthread_mutex_unlock(m->print);
     }
     return (0);
 }
@@ -138,7 +188,9 @@ void    simulation(t_main *m)
     while (i <= m[0].number)//เลขคี่
     {
         if (m[i - 1].name % 2 != 0)
+        {
             pthread_create(&m[i - 1].philo, NULL, &status_philo, (void *)&m[i - 1]);//แตกหน่อ 1
+        }
         i++;
     }
     i = 1;
@@ -146,21 +198,36 @@ void    simulation(t_main *m)
     while (i <= m[0].number)//เลขคู่
     {
         if (m[i - 1].name % 2 == 0)
+        {
             pthread_create(&m[i - 1].philo, NULL, &status_philo, (void *)&m[i - 1]);//แตกหน่อ
+        }
         i++;
     }
-    i = 1;
-    while (i <= m[0].number)
+    i = 0;
+    while (1)
     {
-        pthread_join(m[i - 1].philo,NULL);//รอจนกว่าตัวแรกจะทำงานเสร็จ
+        // printf("mod[%d] = %d\n",i, m[i].mod);
+        if (m[i].mod == 1)
+        {
+            break;
+        }
+        i = i % m.number;
         i++;
     }
-    printf("is died\n");
 }
 
 int main(int argc, char **argv)
 {
     t_main  *m; // t_main *p -> ต้อง malloc (สามารถสร้างหลายชิ้นได้)
+    pthread_mutex_t print;
+
+    for(int i = 0 ; i < 100 ; i++)
+    {
+        printf("%d \n",i%(ft_atoi(argv[1])));
+
+    }
+    exit(1);
+
     if (argc != 5 && argc != 6)
     {
         printf("Error argc\n");
@@ -171,10 +238,20 @@ int main(int argc, char **argv)
         printf("Error is not digit\n");
         return (0);
     }
-    if (ft_atoi(argv[5]) == 0)
+    if (argc == 6 && ft_atoi(argv[5]) == 0)
+    {
         return (0);
+    }
     m = initialize_philo(m, argc, argv);//กำหนดค่าให้กับ Philo ทุกคน
+    pthread_mutex_init(&print,NULL);
+    for (int i = 0 ; i < m->number ; ++i)
+    {
+        m[i].print = &print;
+    }
+    for (int i = 0 ; i < m->number ; ++i)
+        printf("m[i].print = %p\n",m[i].print);
     simulation(m);//Philo กินนอนคิด จับเวลา
+
 
 
 }

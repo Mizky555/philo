@@ -2,7 +2,7 @@ SRCS			= check_file.c philo_util.c philo.c
 
 OBJS			= $(SRCS:.c=.o)
 
-CC				= gcc
+CC				= gcc -g
 RM				= rm -f
 # CFLAGS			= -Wall -Wextra -Werror -pthread
 CFLAGS			= -pthread

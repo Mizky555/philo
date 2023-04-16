@@ -256,12 +256,12 @@ int main(int argc, char **argv)
 
     pthread_mutex_destroy(&m->print2);
     i = 0;
-    while (i <= ft_atoi(argv[1]))
+    while (i < ft_atoi(argv[1]))
     {
         pthread_mutex_destroy(&m[i++].fork_r);
     }
     i = 0;
-    while (i <= m[0].number)
+    while (i < m[0].number)
     {
         pthread_detach(m[i++].philo);
     }

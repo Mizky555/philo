@@ -146,7 +146,7 @@ void    *status_philo(void *input)
 
         if (m->meals == m->must_eat)
         {
-            m->mod = 1;
+            m->mod = 2;
             return (0);
         }
 
@@ -159,7 +159,7 @@ void    *status_philo(void *input)
             m->mod = 1;
             pthread_mutex_lock(m->print);
             printf("%ld ms, %d is die\n",time_milli() - start, m->name);
-            exit(0);
+            return (0);
         }
 
         pthread_mutex_lock(m->print);
@@ -184,7 +184,13 @@ void    simulation(t_main *m)
 {
     int i = 1;
 
-
+    if (m[0].number == 1)
+    {
+        printf("%d ms, %d has taken a fork_r\n",0, m->name);
+        usleep(m[0].time_die * 1000);
+        printf("%d ms, %d is die\n",m[0].time_die, m->name);
+        return;
+    }
     while (i <= m[0].number)//เลขคี่
     {
         if (m[i - 1].name % 2 != 0)
@@ -204,12 +210,23 @@ void    simulation(t_main *m)
         i++;
     }
     i = 0;
+    int jj;
     while (1)
     {
         if (m[i % (m->number)].mod == 1)
         {
             break;
         }
+        jj = 0;
+        for (int j = 0 ;j < m->number ; ++j)
+        {
+            if (m[j].mod == 2)
+            {
+                jj++;
+            }
+        }
+        if (jj == m->number - 1)
+            break;
         i++;
     }
 }

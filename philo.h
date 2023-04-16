@@ -19,6 +19,7 @@ typedef struct s_main
     int fork;
     long after_eat_time;
     int mod;
+    int argc;
     pthread_t philo;
     pthread_mutex_t *print;
     pthread_mutex_t print2;

@@ -40,6 +40,7 @@ t_main *initialize_philo(t_main *m, int argc, char **argv) //แปลว่า�
         m[i - 1].name = i;
         m[i - 1].after_eat_time = 0;
         m[i - 1].mod = 0;
+        m[i - 1].argc = argc;
         if (argc == 6)
             m[i - 1].must_eat = ft_atoi(argv[5]);
         else if (argc == 5)
@@ -110,6 +111,15 @@ void    *status_philo(void *input)
     long    start;
 
     m = (t_main *)input;
+    if (m->number == 1)
+    {
+
+        printf("%d ms, %d has taken a fork_r\n",0, m->name);
+        usleep(m->time_die * 1000);
+        printf("%d ms, %d is die\n",m->time_die, m->name);
+        m->mod = 1;
+        return (0);
+    }
     start = time_milli(); //start
     m->after_eat_time = start;
 
@@ -184,13 +194,13 @@ void    simulation(t_main *m)
 {
     int i = 1;
 
-    if (m[0].number == 1)
-    {
-        printf("%d ms, %d has taken a fork_r\n",0, m->name);
-        usleep(m[0].time_die * 1000);
-        printf("%d ms, %d is die\n",m[0].time_die, m->name);
-        return;
-    }
+    // if (m[0].number == 1)
+    // {
+    //     printf("%d ms, %d has taken a fork_r\n",0, m->name);
+    //     usleep(m[0].time_die * 1000);
+    //     printf("%d ms, %d is die\n",m[0].time_die, m->name);
+    //     return;
+    // }
     while (i <= m[0].number)//เลขคี่
     {
         if (m[i - 1].name % 2 != 0)
@@ -214,20 +224,19 @@ void    simulation(t_main *m)
     while (1)
     {
         if (m[i % (m->number)].mod == 1)
-        {
             break;
-        }
-        jj = 0;
-        for (int j = 0 ;j < m->number ; ++j)
+        if (m->argc == 6)
         {
-            if (m[j].mod == 2)
+            jj = 0;
+            for (int j = 0 ;j < m->number ; ++j)
             {
-                jj++;
+                if (m[j].mod == 2)
+                    jj++;
             }
+            if (jj == m->number - 1)
+                break;
+            i++;
         }
-        if (jj == m->number - 1)
-            break;
-        i++;
     }
 }
 
@@ -267,6 +276,3 @@ int main(int argc, char **argv)
     }
     free(m);
 }
-
-
-//ดูสูตรพี่เน หาเวลาว่าพอมั้ย ไม่พอให้ตาย

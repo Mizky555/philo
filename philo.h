@@ -44,5 +44,15 @@ int		sleep_to_eat(t_main *m);
 void	ft_print(t_main *m, int mode_print);
 int		check_digit(char **argv);
 int		ft_atoi(const char *str);
+void	ft_free_all(t_main *m);
+void	simulation(t_main *m);
+void	check_end(t_main *m);
+long	time_milli(void);
+t_main	*initialize_philo(t_main *m, int argc, char **argv);
+void	initial_value(t_main *m, int i, int argc, char **argv);
+void	*status_philo(void *input);
+int		is_one_philo(t_main *m);
+int		pickup_fork_to_eat(t_main *m);
+int		is_philo_dead(t_main *m, int activity);
 
 #endif

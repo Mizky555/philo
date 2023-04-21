@@ -1,9 +1,9 @@
-SRCS			= check_file.c philo_util.c philo.c
+SRCS			= check_file.c philo_util.c philo.c initialize.c status.c
 
 OBJS			= $(SRCS:.c=.o)
 
 CC				= gcc
-RM				= rm -f
+RM				= rm -rf
 CFLAGS			= -Wall -Wextra -Werror -pthread
 CFLAGS			= -pthread
 
@@ -19,9 +19,9 @@ clean:
 					$(RM) $(OBJS)
 
 fclean:			clean
-					$(RM) $(NAME)
+					$(RM) $(NAME) $(NAME).dSYM
 
 re:				fclean $(NAME)
 
 
-.PHONY:			all clean fclean re bonus
+.PHONY:			all clean fclean re

@@ -67,8 +67,8 @@ void	check_end(t_main *m)
 			}
 			if (philo_full == m->number)
 				break ;
-			i++;
 		}
+		i++;
 	}
 }
 
@@ -103,9 +103,9 @@ void	ft_free_all(t_main *m)
 	pthread_mutex_destroy(&m->print2);
 	i = 0;
 	while (i < m[0].number)
-		pthread_mutex_destroy(&m[i++].fork_r);
-	i = 0;
-	while (i < m[0].number)
 		pthread_detach(m[i++].philo);
+		i = 0;
+	while (i < m[0].number)
+		pthread_mutex_destroy(&m[i++].fork_r);
 	free(m);
 }
